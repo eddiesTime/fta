@@ -45,6 +45,11 @@ class _GameResultsListView extends StatelessWidget {
         if (state is GameResultsListLoading) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is GameResultsListLoadingSuccess) {
+          if (state.results.isEmpty) {
+            return Center(
+              child: Text('No results yet. Please add games first!'),
+            );
+          }
           return ListView.builder(
             itemCount: state.results.length,
             itemBuilder: (context, index) =>
@@ -110,13 +115,14 @@ class GameResultsListItem extends StatelessWidget {
               ),
             ],
           ),
-          onTap: () {
-            Navigator.push(
+          onTap: () async {
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (_) => GameResultDetailPage(result: result),
               ),
             );
+            BlocProvider.of<GameResultsListCubit>(context).loadResults();
           },
         ),
       ),

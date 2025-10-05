@@ -51,6 +51,7 @@ void main() {
         );
       },
       seed: () => AddOrEditGameResultInitial(result: initialGameResult),
+
       act: (cubit) {
         final result = (cubit.state as AddOrEditGameResultInitial).result!;
         final updateResult = result.copyWith(
@@ -70,22 +71,4 @@ void main() {
       ],
     );
   });
-}
-
-extension GameResultX on GameResult {
-  GameResult copyWith({
-    String? id,
-    String? player1Name,
-    String? player2Name,
-    int? player1Goals,
-    int? player2Goals,
-  }) {
-    return GameResult(
-      id: id ?? this.id,
-      player1Name: player1Name ?? this.player1Name,
-      player2Name: player2Name ?? this.player2Name,
-      player1Goals: player1Goals ?? this.player1Goals,
-      player2Goals: player2Goals ?? this.player2Goals,
-    );
-  }
 }

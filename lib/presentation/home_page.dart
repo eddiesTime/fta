@@ -29,7 +29,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(_selectedIndex == 0 ? 'Add Game' : 'Results')),
-      body: _pages[_selectedIndex],
+      body: Padding(
+        padding: EdgeInsetsGeometry.symmetric(horizontal: 16),
+        child: _pages[_selectedIndex],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,

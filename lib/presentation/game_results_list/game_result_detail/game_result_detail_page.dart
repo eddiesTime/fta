@@ -1,52 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:foosball_tournament_app/domain/models/game_result.dart';
+import 'package:foosball_tournament_app/presentation/add_or_edit_game_result/add_or_edit_game_result_page.dart';
 
-class GameResultDetailPage extends StatelessWidget {
+class GameResultDetailPage extends StatefulWidget {
   final GameResult result;
 
   const GameResultDetailPage({super.key, required this.result});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Game Details')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildPlayerRow(
-              result.player1Name,
-              result.player1Goals,
-              result.winner == result.player1Name,
-            ),
-            const SizedBox(height: 8),
-            _buildPlayerRow(
-              result.player2Name,
-              result.player2Goals,
-              result.winner == result.player2Name,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Winner: ${result.winner}',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-          ],
-        ),
-      ),
-    );
+  State<GameResultDetailPage> createState() => _GameResultDetailPageState();
+}
+
+class _GameResultDetailPageState extends State<GameResultDetailPage> {
+  bool _editMode = false;
+  void _toggleEditMode() {
+    setState(() {
+      _editMode = !_editMode;
+    });
   }
 
-  Widget _buildPlayerRow(String name, int goals, bool isWinner) {
-    return Row(
-      children: [
-        Expanded(child: Text(name, style: const TextStyle(fontSize: 16))),
-        Text('Goals: $goals'),
-        if (isWinner) ...[
-          const SizedBox(width: 8),
-          const Icon(Icons.emoji_events, color: Colors.amber),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Game Details'),
+        actions: [
+          IconButton(onPressed: _toggleEditMode, icon: Icon(Icons.edit)),
         ],
-      ],
+      ),
+      body: AddOrEditGameResultPage(
+        initialGameResult: widget.result,
+        isEditMode: _editMode,
+      ),
     );
   }
 }

@@ -7,7 +7,12 @@ import 'package:foosball_tournament_app/presentation/util/widgets/app_snack_bars
 
 class AddOrEditGameResultPage extends StatelessWidget {
   final GameResult? initialGameResult;
-  const AddOrEditGameResultPage({super.key, this.initialGameResult});
+  final bool isEditMode;
+  const AddOrEditGameResultPage({
+    super.key,
+    this.initialGameResult,
+    this.isEditMode = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,13 +21,14 @@ class AddOrEditGameResultPage extends StatelessWidget {
         resultRepository: context.read<SharedPrefsGameResultRepository>(),
         result: initialGameResult,
       ),
-      child: _AddOrEditGameResultView(),
+      child: _AddOrEditGameResultView(isEditMode: isEditMode),
     );
   }
 }
 
 class _AddOrEditGameResultView extends StatefulWidget {
-  const _AddOrEditGameResultView();
+  final bool isEditMode;
+  const _AddOrEditGameResultView({this.isEditMode = false});
 
   @override
   State<_AddOrEditGameResultView> createState() =>
@@ -74,17 +80,25 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
     }
 
     final cubit = context.read<AddOrEditGameResultCubit>();
-    final result = GameResult(
-      player1Name: player1NameController.text,
-      player2Name: player2NameController.text,
-      player1Goals: int.tryParse(player1GoalsController.text) ?? 0,
-      player2Goals: int.tryParse(player2GoalsController.text) ?? 0,
-    );
 
     if (initialGameResult == null) {
+      final result = GameResult(
+        player1Name: player1NameController.text,
+        player2Name: player2NameController.text,
+        player1Goals: int.tryParse(player1GoalsController.text) ?? 0,
+        player2Goals: int.tryParse(player2GoalsController.text) ?? 0,
+      );
       cubit.addGameResult(result);
     } else {
-      cubit.editGameResult(result);
+      final currentGameResult = initialGameResult!.copyWith(
+        player1Name: player1NameController.text,
+        player2Name: player2NameController.text,
+        player1Goals: int.tryParse(player1GoalsController.text) ?? 0,
+        player2Goals: int.tryParse(player2GoalsController.text) ?? 0,
+      );
+      if (currentGameResult != initialGameResult) {
+        cubit.editGameResult(currentGameResult);
+      }
     }
     FocusScope.of(context).unfocus();
   }
@@ -122,6 +136,7 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
               children: [
                 TextFormField(
                   controller: player1NameController,
+                  readOnly: !widget.isEditMode,
                   decoration: const InputDecoration(labelText: 'Player 1 Name'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -135,6 +150,7 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
                 ),
                 TextFormField(
                   controller: player2NameController,
+                  readOnly: !widget.isEditMode,
                   decoration: const InputDecoration(labelText: 'Player 2 Name'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -148,6 +164,7 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
                 ),
                 TextFormField(
                   controller: player1GoalsController,
+                  readOnly: !widget.isEditMode,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: 'Player 1 Goals',
@@ -174,6 +191,7 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
                 ),
                 TextFormField(
                   controller: player2GoalsController,
+                  readOnly: !widget.isEditMode,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: 'Player 2 Goals',
@@ -198,11 +216,19 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
                   },
                 ),
                 const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _onButtonTapped,
-                  child: Text(initialGameResult == null ? 'Save' : 'Update'),
-                ),
-                ElevatedButton(onPressed: _clearFields, child: Text('Clear')),
+                if (initialGameResult == null) ...[
+                  ElevatedButton(
+                    onPressed: _onButtonTapped,
+                    child: Text('Save'),
+                  ),
+                  ElevatedButton(onPressed: _clearFields, child: Text('Clear')),
+                ],
+                if (widget.isEditMode) ...[
+                  ElevatedButton(
+                    onPressed: _onButtonTapped,
+                    child: Text('Update'),
+                  ),
+                ],
               ],
             ),
           ),
