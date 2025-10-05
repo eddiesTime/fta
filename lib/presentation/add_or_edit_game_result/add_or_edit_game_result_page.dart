@@ -29,6 +29,8 @@ class _AddOrEditGameResultView extends StatefulWidget {
 }
 
 class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
+  final _formKey = GlobalKey<FormState>();
+
   late final TextEditingController player1NameController;
   late final TextEditingController player2NameController;
   late final TextEditingController player1GoalsController;
@@ -66,6 +68,10 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
   }
 
   void _onButtonTapped() {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
     final cubit = context.read<AddOrEditGameResultCubit>();
     final result = GameResult(
       player1Name: player1NameController.text,
@@ -79,6 +85,7 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
     } else {
       cubit.editGameResult(result);
     }
+    Focus.of(context).unfocus();
   }
 
   void _clearFields() {
@@ -86,6 +93,7 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
     player2NameController.text = '';
     player1GoalsController.text = '';
     player2GoalsController.text = '';
+    _formKey.currentState?.reset();
   }
 
   @override
@@ -103,35 +111,87 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
         }
       },
       child: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: player1NameController,
-              decoration: const InputDecoration(labelText: 'Player 1 Name'),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: player1NameController,
+                  decoration: const InputDecoration(labelText: 'Player 1 Name'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Cannot be empty';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: player2NameController,
+                  decoration: const InputDecoration(labelText: 'Player 2 Name'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Cannot be empty';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: player1GoalsController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Player 1 Goals',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Cannot be empty';
+                    }
+
+                    try {
+                      final val = int.parse(value);
+                      if (val < 0) {
+                        return 'Negative score is not allowed!';
+                      }
+                    } catch (e) {
+                      return 'Value has to be integer';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: player2GoalsController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Player 2 Goals',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Cannot be empty';
+                    }
+
+                    try {
+                      final val = int.parse(value);
+                      if (val < 0) {
+                        return 'Negative score is not allowed!';
+                      }
+                    } catch (e) {
+                      return 'Value has to be integer';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: _onButtonTapped,
+                  child: Text(initialGameResult == null ? 'Save' : 'Update'),
+                ),
+                ElevatedButton(onPressed: _clearFields, child: Text('Clear')),
+              ],
             ),
-            TextField(
-              controller: player2NameController,
-              decoration: const InputDecoration(labelText: 'Player 2 Name'),
-            ),
-            TextField(
-              controller: player1GoalsController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Player 1 Goals'),
-            ),
-            TextField(
-              controller: player2GoalsController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Player 2 Goals'),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _onButtonTapped,
-              child: Text(initialGameResult == null ? 'Save' : 'Update'),
-            ),
-            ElevatedButton(onPressed: _clearFields, child: Text('Clear')),
-          ],
+          ),
         ),
       ),
     );
