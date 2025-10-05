@@ -1,36 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foosball_tournament_app/data/shared_prefs_game_result_repository.dart';
 import 'package:foosball_tournament_app/domain/model/game_result.dart';
+import 'package:foosball_tournament_app/presentation/add_or_edit_game_result/cubit/add_or_edit_game_result_cubit.dart';
 
-class AddOrEditGameResultPage extends StatefulWidget {
-  const AddOrEditGameResultPage({super.key, this.gameResult});
-
-  final GameResult? gameResult;
+class AddOrEditGameResultPage extends StatelessWidget {
+  final GameResult? initialGameResult;
+  const AddOrEditGameResultPage({super.key, this.initialGameResult});
 
   @override
-  State<AddOrEditGameResultPage> createState() =>
-      _AddOrEditGameResultPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => AddOrEditGameResultCubit(
+        resultRepository: context.read<SharedPrefsGameResultRepository>(),
+        result: initialGameResult,
+      ),
+      child: _AddOrEditGameResultView(),
+    );
+  }
 }
 
-class _AddOrEditGameResultPageState extends State<AddOrEditGameResultPage> {
+class _AddOrEditGameResultView extends StatefulWidget {
+  const _AddOrEditGameResultView();
+
+  @override
+  State<_AddOrEditGameResultView> createState() =>
+      _AddOrEditGameResultViewState();
+}
+
+class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
   late final TextEditingController player1NameController;
   late final TextEditingController player2NameController;
   late final TextEditingController player1GoalsController;
   late final TextEditingController player2GoalsController;
+  late final GameResult? initialGameResult;
 
   @override
   void initState() {
     super.initState();
+    final cubit = context.read<AddOrEditGameResultCubit>();
+    initialGameResult = cubit.state is AddOrEditGameResultInitial
+        ? cubit.result
+        : null;
     player1NameController = TextEditingController(
-      text: widget.gameResult?.player1Name ?? '',
+      text: initialGameResult?.player1Name ?? '',
     );
     player2NameController = TextEditingController(
-      text: widget.gameResult?.player2Name ?? '',
+      text: initialGameResult?.player2Name ?? '',
     );
     player1GoalsController = TextEditingController(
-      text: widget.gameResult?.player1GoalsStr ?? '',
+      text: initialGameResult?.player1GoalsStr ?? '',
     );
     player2GoalsController = TextEditingController(
-      text: widget.gameResult?.player2GoalsStr ?? '',
+      text: initialGameResult?.player2GoalsStr ?? '',
     );
   }
 
@@ -43,40 +65,74 @@ class _AddOrEditGameResultPageState extends State<AddOrEditGameResultPage> {
     super.dispose();
   }
 
+  void _onButtonTapped() {
+    final cubit = context.read<AddOrEditGameResultCubit>();
+    final result = GameResult(
+      player1Name: player1NameController.text,
+      player2Name: player2NameController.text,
+      player1Goals: int.tryParse(player1GoalsController.text) ?? 0,
+      player2Goals: int.tryParse(player2GoalsController.text) ?? 0,
+    );
+
+    if (initialGameResult == null) {
+      cubit.addGameResult(result);
+    } else {
+      cubit.editGameResult(result);
+    }
+  }
+
+  void _clearFields() {
+    player1NameController.text = '';
+    player2NameController.text = '';
+    player1GoalsController.text = '';
+    player2GoalsController.text = '';
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: player1NameController,
-            decoration: const InputDecoration(labelText: 'Player 1 Name'),
-          ),
-          TextField(
-            controller: player2NameController,
-            decoration: const InputDecoration(labelText: 'Player 2 Name'),
-          ),
-          TextField(
-            controller: player1GoalsController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'Player 1 Goals'),
-          ),
-          TextField(
-            controller: player2GoalsController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'Player 2 Goals'),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: () {
-              print('Pressed save');
-              FocusScope.of(context).unfocus();
-            },
-            child: Text(widget.gameResult == null ? 'Save' : 'Update'),
-          ),
-        ],
+    return BlocListener<AddOrEditGameResultCubit, AddOrEditGameResultState>(
+      listener: (context, state) {
+        if (state is AddOrEditGameResultSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Game saved successfully!')),
+          );
+        } else if (state is AddOrEditGameResultError) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error: ${state.errorStr}')));
+        }
+      },
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: player1NameController,
+              decoration: const InputDecoration(labelText: 'Player 1 Name'),
+            ),
+            TextField(
+              controller: player2NameController,
+              decoration: const InputDecoration(labelText: 'Player 2 Name'),
+            ),
+            TextField(
+              controller: player1GoalsController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Player 1 Goals'),
+            ),
+            TextField(
+              controller: player2GoalsController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Player 2 Goals'),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: _onButtonTapped,
+              child: Text(initialGameResult == null ? 'Save' : 'Update'),
+            ),
+            ElevatedButton(onPressed: _clearFields, child: Text('Clear')),
+          ],
+        ),
       ),
     );
   }
