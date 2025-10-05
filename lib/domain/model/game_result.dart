@@ -15,6 +15,9 @@ class GameResult {
     return player1Goals > player2Goals ? player1Name : player2Name;
   }
 
+  String get player1GoalsStr => player1Goals.toString();
+  String get player2GoalsStr => player2Goals.toString();
+
   GameResult({
     String? id,
     required this.player1Name,
