@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foosball_tournament_app/data/shared_prefs_game_result_repository.dart';
-import 'package:foosball_tournament_app/domain/model/game_result.dart';
+import 'package:foosball_tournament_app/domain/models/game_result.dart';
 import 'package:foosball_tournament_app/presentation/add_or_edit_game_result/cubit/add_or_edit_game_result_cubit.dart';
+import 'package:foosball_tournament_app/presentation/util/widgets/app_snack_bars.dart';
 
 class AddOrEditGameResultPage extends StatelessWidget {
   final GameResult? initialGameResult;
@@ -85,7 +86,7 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
     } else {
       cubit.editGameResult(result);
     }
-    Focus.of(context).unfocus();
+    FocusScope.of(context).unfocus();
   }
 
   void _clearFields() {
@@ -101,13 +102,13 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
     return BlocListener<AddOrEditGameResultCubit, AddOrEditGameResultState>(
       listener: (context, state) {
         if (state is AddOrEditGameResultSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Game saved successfully!')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(AppSnackBars.success('Game saved successfully!'));
         } else if (state is AddOrEditGameResultError) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('Error: ${state.errorStr}')));
+          ).showSnackBar(AppSnackBars.error('Error: ${state.errorStr}'));
         }
       },
       child: SingleChildScrollView(
@@ -126,6 +127,9 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
                     if (value == null || value.isEmpty) {
                       return 'Cannot be empty';
                     }
+                    if (value == player2NameController.text) {
+                      return 'It has to be two different players!';
+                    }
                     return null;
                   },
                 ),
@@ -135,6 +139,9 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Cannot be empty';
+                    }
+                    if (value == player1NameController.text) {
+                      return 'It has to be two different players!';
                     }
                     return null;
                   },
@@ -155,9 +162,13 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
                       if (val < 0) {
                         return 'Negative score is not allowed!';
                       }
+                      if (val == int.tryParse(player2GoalsController.text)) {
+                        return 'Tie not allowed. There has to be a winner!';
+                      }
                     } catch (e) {
                       return 'Value has to be integer';
                     }
+
                     return null;
                   },
                 ),
@@ -176,6 +187,9 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
                       final val = int.parse(value);
                       if (val < 0) {
                         return 'Negative score is not allowed!';
+                      }
+                      if (val == int.tryParse(player1GoalsController.text)) {
+                        return 'Tie not allowed. There has to be a winner!';
                       }
                     } catch (e) {
                       return 'Value has to be integer';

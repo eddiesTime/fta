@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foosball_tournament_app/domain/model/game_result.dart';
+import 'package:foosball_tournament_app/domain/models/game_result.dart';
 
 class GameResultDetailPage extends StatelessWidget {
   final GameResult result;

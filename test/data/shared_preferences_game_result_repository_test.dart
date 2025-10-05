@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foosball_tournament_app/data/shared_prefs_game_result_repository.dart';
-import 'package:foosball_tournament_app/domain/model/game_result.dart';
+import 'package:foosball_tournament_app/domain/models/game_result.dart';
 
 void main() {
   late SharedPrefsGameResultRepository repository;
