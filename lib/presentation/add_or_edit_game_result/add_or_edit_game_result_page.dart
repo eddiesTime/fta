@@ -44,6 +44,8 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
   late final TextEditingController player2GoalsController;
   late final GameResult? initialGameResult;
 
+  bool get isEditing => widget.isEditMode || initialGameResult == null;
+
   @override
   void initState() {
     super.initState();
@@ -136,7 +138,7 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
               children: [
                 TextFormField(
                   controller: player1NameController,
-                  readOnly: !widget.isEditMode,
+                  readOnly: !isEditing,
                   decoration: const InputDecoration(labelText: 'Player 1 Name'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -150,7 +152,7 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
                 ),
                 TextFormField(
                   controller: player2NameController,
-                  readOnly: !widget.isEditMode,
+                  readOnly: !isEditing,
                   decoration: const InputDecoration(labelText: 'Player 2 Name'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -164,7 +166,7 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
                 ),
                 TextFormField(
                   controller: player1GoalsController,
-                  readOnly: !widget.isEditMode,
+                  readOnly: !isEditing,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: 'Player 1 Goals',
@@ -191,7 +193,7 @@ class _AddOrEditGameResultViewState extends State<_AddOrEditGameResultView> {
                 ),
                 TextFormField(
                   controller: player2GoalsController,
-                  readOnly: !widget.isEditMode,
+                  readOnly: !isEditing,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: 'Player 2 Goals',

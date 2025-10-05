@@ -83,7 +83,9 @@ void main() {
       );
 
       await tester.pumpWidget(
-        wrapWithProviders(AddOrEditGameResultPage(initialGameResult: game)),
+        wrapWithProviders(
+          AddOrEditGameResultPage(initialGameResult: game, isEditMode: true),
+        ),
       );
       await tester.pumpAndSettle();
 
