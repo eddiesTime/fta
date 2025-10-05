@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:foosball_tournament_app/domain/interface/game_result_repository.dart';
-import 'package:foosball_tournament_app/domain/model/game_result.dart';
+import 'package:foosball_tournament_app/domain/interfaces/game_result_repository.dart';
+import 'package:foosball_tournament_app/domain/models/game_result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefsGameResultRepository implements GameResultRepository {

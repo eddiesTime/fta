@@ -1,5 +1,5 @@
-import 'package:foosball_tournament_app/domain/interface/game_result_repository.dart';
-import 'package:foosball_tournament_app/domain/model/game_result.dart';
+import 'package:foosball_tournament_app/domain/interfaces/game_result_repository.dart';
+import 'package:foosball_tournament_app/domain/models/game_result.dart';
 
 /// This can be used to retrieve the game result data from a remote server.
 /// The purpose of this repository is to show how the logic can be abstracted

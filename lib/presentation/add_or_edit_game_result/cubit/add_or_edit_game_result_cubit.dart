@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:foosball_tournament_app/domain/interface/game_result_repository.dart';
-import 'package:foosball_tournament_app/domain/model/game_result.dart';
+import 'package:foosball_tournament_app/domain/interfaces/game_result_repository.dart';
+import 'package:foosball_tournament_app/domain/models/game_result.dart';
 import 'package:meta/meta.dart';
 
 part 'add_or_edit_game_result_state.dart';

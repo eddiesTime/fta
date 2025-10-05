@@ -37,3 +37,18 @@ final class GameResultsListLoadingError extends GameResultsListState {
   @override
   List<Object?> get props => [errorStr];
 }
+
+final class GameResultsListItemDeletionSuccess extends GameResultsListState {
+  const GameResultsListItemDeletionSuccess();
+
+  @override
+  List<Object?> get props => [];
+}
+
+final class GameResultsListItemDeletionError extends GameResultsListState {
+  const GameResultsListItemDeletionError({required this.errorStr});
+  final String errorStr;
+
+  @override
+  List<Object?> get props => [errorStr];
+}
